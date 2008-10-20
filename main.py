@@ -35,6 +35,7 @@ class MainHandler(webapp.RequestHandler):
     if not url:
       raise Exception("no url provided")
     try:
+      url = url.replace(" ", "%20")
       result = urlfetch.fetch(url)
       if result.status_code == 200:
         if len(result.content) > MAX_STORY_SIZE:
@@ -50,7 +51,8 @@ class MainHandler(webapp.RequestHandler):
 
         response = {"data" : base64.b64encode(result.content)}
       else:
-        raise Exception("got status code %d" % result.status_code)
+        raise Exception("got status code %d for url %s" % (result.status_code,
+                                                           url))
     except Exception, e:
       response = {"error" : repr(e)}
     self.response.headers["Content-Type"] = "text/javascript"
