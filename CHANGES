@@ -3,3 +3,4 @@ Change log started October 2009.
 October 2009
 ================================================================================
  - Use simplejson so json.py can be removed.
+ + Use memcache to cache file downloads.
