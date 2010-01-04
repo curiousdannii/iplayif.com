@@ -1,5 +1,11 @@
 Change log started October 2009.
 
+January 2010
+================================================================================
+ + Began working on version 2
+ + Split out get_file() to mirror.get().
+
+
 October 2009
 ================================================================================
  - Use simplejson so json.py can be removed.
