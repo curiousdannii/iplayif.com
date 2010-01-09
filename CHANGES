@@ -4,6 +4,7 @@ January 2010
 ================================================================================
  + Began working on version 2
  + Split out get_file() to mirror.get().
+ + Renamed MainHandler to LegacyHandler and added ProxyHandler.
 
 
 October 2009

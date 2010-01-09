@@ -5,7 +5,6 @@
 
 # main.py: Main server and response handler
 
-import wsgiref.handlers
 import base64
 
 from django.utils import simplejson
@@ -13,7 +12,37 @@ from google.appengine.ext import webapp
 
 import mirror
 
-class MainHandler(webapp.RequestHandler):
+class ProxyHandler(webapp.RequestHandler):
+	'''The parchment-proxy server itself'''
+	
+	def get(self):
+		url = self.request.get('url')
+		encode = self.request.get('base64')
+		
+		try:
+			if not url:
+				raise Exception('no url provided')
+			
+			# Get this URL
+			url = url.replace(' ', '%20')
+			data = mirror.get(url)
+			
+			# Base64 encode the data if required, and set the content type
+			if encode:
+				data = base64.b64encode(data)
+				self.response.headers['Content-Type'] = 'text/plain'
+			else:
+				self.response.headers['Content-Type'] = 'application/octet-stream'
+			
+		except:
+			pass
+		
+		# Set a header for allowing cross domain XHR and send the data
+		self.response.headers['Access-Control-Allow-Origin'] = '*'
+		self.response.out.write(data)
+
+class LegacyHandler(webapp.RequestHandler):
+  '''The original jsonp proxy server'''
   def get(self):
     url = self.request.get("url")
     jsonp = self.request.get("jsonp")
@@ -33,9 +62,11 @@ class MainHandler(webapp.RequestHandler):
     self.response.out.write("%s(%s);" % (jsonp, simplejson.dumps(response)))
 
 def main():
-  application = webapp.WSGIApplication([('/', MainHandler)],
-                                       debug=True)
-  wsgiref.handlers.CGIHandler().run(application)
+	application = webapp.WSGIApplication([
+	                                      ('/proxy', ProxyHandler),
+	                                      ('/', LegacyHandler),
+	                                     ], debug=True)
+	webapp.util.run_wsgi_app(application)
 
 if __name__ == '__main__':
   main()
