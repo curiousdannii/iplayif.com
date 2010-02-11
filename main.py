@@ -9,6 +9,7 @@ import base64
 
 from django.utils import simplejson
 from google.appengine.ext import webapp
+from google.appengine.ext.webapp.util import run_wsgi_app
 
 import mirror
 
@@ -16,8 +17,9 @@ class ProxyHandler(webapp.RequestHandler):
 	'''The parchment-proxy server itself'''
 	
 	def get(self):
+		data = ''
 		url = self.request.get('url')
-		encode = self.request.get('base64')
+		encode = self.request.get('encode')
 		
 		try:
 			if not url:
@@ -27,18 +29,16 @@ class ProxyHandler(webapp.RequestHandler):
 			url = url.replace(' ', '%20')
 			data = mirror.get(url)
 			
-			# Base64 encode the data if required, and set the content type
-			if encode:
+			# Base64 encode the data if required
+			if encode == 'base64':
 				data = base64.b64encode(data)
-				self.response.headers['Content-Type'] = 'text/plain'
-			else:
-				self.response.headers['Content-Type'] = 'application/octet-stream'
 			
 		except:
 			pass
 		
 		# Set a header for allowing cross domain XHR and send the data
 		self.response.headers['Access-Control-Allow-Origin'] = '*'
+		self.response.headers['Content-Type'] = 'text/plain; charset=ISO-8859-1'
 		self.response.out.write(data)
 
 class LegacyHandler(webapp.RequestHandler):
@@ -63,10 +63,10 @@ class LegacyHandler(webapp.RequestHandler):
 
 def main():
 	application = webapp.WSGIApplication([
-	                                      ('/proxy', ProxyHandler),
+	                                      ('/proxy/?', ProxyHandler),
 	                                      ('/', LegacyHandler),
 	                                     ], debug=True)
-	webapp.util.run_wsgi_app(application)
+	run_wsgi_app(application)
 
 if __name__ == '__main__':
   main()
