@@ -19,6 +19,7 @@ class ProxyHandler(webapp.RequestHandler):
 	def get(self):
 		data = ''
 		url = self.request.get('url')
+		callback = self.request.get('callback')
 		encode = self.request.get('encode')
 		
 		try:
@@ -30,11 +31,16 @@ class ProxyHandler(webapp.RequestHandler):
 			data = mirror.get(url)
 			
 			# Base64 encode the data if required
-			if encode == 'base64':
+			if encode == 'base64' or callback:
 				data = base64.b64encode(data)
 			
 		except:
 			pass
+			
+		# Handle a callback function
+		if callback:
+			# Data must be escaped for javascript
+			data = callback + '("' + data + '")'
 		
 		# Set a header for allowing cross domain XHR and send the data
 		self.response.headers['Access-Control-Allow-Origin'] = '*'

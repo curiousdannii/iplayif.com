@@ -3,6 +3,7 @@ Change log started October 2009.
 February 2010
 ================================================================================
  + A few changes were needed for it to actually work.
+ + Add support for a callback function.
 
 January 2010
 ================================================================================
