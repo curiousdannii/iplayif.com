@@ -1,5 +1,10 @@
 Change log started October 2009.
 
+June 2010
+================================================================================
+Add support for Glulx.
+Handle errors properly.
+
 February 2010
 ================================================================================
  + A few changes were needed for it to actually work.

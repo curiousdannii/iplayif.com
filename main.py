@@ -17,13 +17,17 @@ class ProxyHandler(webapp.RequestHandler):
 	'''The parchment-proxy server itself'''
 	
 	def get(self):
+		code = 200
 		data = ''
+		
+		# Parameters
 		url = self.request.get('url')
 		callback = self.request.get('callback')
 		encode = self.request.get('encode')
 		
 		try:
 			if not url:
+				code = 400
 				raise Exception('no url provided')
 			
 			# Get this URL
@@ -31,16 +35,22 @@ class ProxyHandler(webapp.RequestHandler):
 			data = mirror.get(url)
 			
 			# Base64 encode the data if required
-			if encode == 'base64' or callback:
+			if encode == 'base64':
 				data = base64.b64encode(data)
 			
-		except:
-			pass
+			# Handle a callback function
+			if callback:
+				# Warning, data must be escaped too
+				data = callback + '("' + data + '")'
 			
-		# Handle a callback function
-		if callback:
-			# Data must be escaped for javascript
-			data = callback + '("' + data + '")'
+		except Exception, e:
+			# Set the HTTP status code
+			if code == 200:
+				code = 500
+			self.response.set_status(code)
+			
+			# Write out the error message
+			data = e
 		
 		# Set a header for allowing cross domain XHR and send the data
 		self.response.headers['Access-Control-Allow-Origin'] = '*'

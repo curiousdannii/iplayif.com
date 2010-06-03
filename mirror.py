@@ -34,11 +34,11 @@ def get(url):
 		if len(result.content) > MAX_FILE_SIZE:
 			raise Exception('file too large')
 		
-		# Check it's a valid zcode story file
-		if data.startswith('FORM') or ord(data[0]) < 9:
+		# Check it's a valid glulx/zcode story file
+		if data.startswith('FORM') or data.startswith('Glul') or ord(data[0]) < 9:
 			pass
 		else:
-			raise Exception('url does not contain a zcode story file')
+			raise Exception('url does not contain a story file')
 		
 		# All good... cache it and return
 		if not memcache.add(url, data, 3600):
