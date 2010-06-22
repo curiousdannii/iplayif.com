@@ -56,6 +56,14 @@ class ProxyHandler(webapp.RequestHandler):
 		self.response.headers['Access-Control-Allow-Origin'] = '*'
 		self.response.headers['Content-Type'] = 'text/plain; charset=ISO-8859-1'
 		self.response.out.write(data)
+		
+	def options(self):
+		# Send Access-Control headers for preflighted requests
+		
+		self.response.headers['Access-Control-Allow-Origin'] = '*'
+		self.response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
+		# Why must Prototype add these?
+		self.response.headers['Access-Control-Allow-Headers'] = 'x-prototype-version, x-requested-with'
 
 class LegacyHandler(webapp.RequestHandler):
   '''The original jsonp proxy server'''

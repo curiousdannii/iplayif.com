@@ -26,6 +26,6 @@ Parameters:
    If you're using jQuery, set the dataType to 'jsonp' and it will automatically create the callback function and add this parameter for you. Other libraries may do the same.
    If you use a callback, also set encode=base64.
 
-Parchment-proxy will send the data with a Content-Type header of 'text/plain; charset=ISO-8859-1' and an Access-Control-Allow-Origin header of '*' for cross-domain AJAX requests.
+Parchment-proxy will send the data with a Content-Type header of 'text/plain; charset=ISO-8859-1' and an Access-Control-Allow-Origin header of '*' for cross-site AJAX requests. Similarly, it will handle an OPTIONS request if you need to preflight your cross-site requests.
 
 There is currently a limit of 1MB for requested files.
