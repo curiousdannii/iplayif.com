@@ -5,6 +5,7 @@ June 2010
 Add support for Glulx.
 Handle errors properly.
 Handle OPTIONS and send Access-Control headers for preflighted requests.
+Add support for big file requests, by making urlfetch requests with a Range header.
 
 February 2010
 ================================================================================

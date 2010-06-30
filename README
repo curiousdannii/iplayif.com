@@ -28,4 +28,4 @@ Parameters:
 
 Parchment-proxy will send the data with a Content-Type header of 'text/plain; charset=ISO-8859-1' and an Access-Control-Allow-Origin header of '*' for cross-site AJAX requests. Similarly, it will handle an OPTIONS request if you need to preflight your cross-site requests.
 
-There is currently a limit of 1MB for requested files.
+There is currently a limit no limit for requested files, but as big files aren't cached, please be gentle!
