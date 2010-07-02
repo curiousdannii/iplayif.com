@@ -10,8 +10,10 @@ import logging
 from google.appengine.api import memcache
 from google.appengine.api import urlfetch
 
+from errors import *
+
 # Maximum size of a story file we'll download, in bytes.
-MAX_FILE_SIZE = 1024 * 1000
+MAX_FILE_SIZE = 1000000
 
 def get(url):
 	'''Get a file, using memcache if possible'''
@@ -23,11 +25,11 @@ def get(url):
 	
 	# Missed! Attempt to download it now
 	else:
-		result = urlfetch.fetch(url, allow_truncated=True)
+		result = fetch_single(url)
 		
 		# HTTP Status code
 		if result.status_code != 200:
-			raise Exception('got status code %d for url %s' % (result.status_code, url))
+			raise ProxyError('got status code %d for url %s' % (result.status_code, url))
 		
 		# Check for oversized requests
 		data = result.content
@@ -38,7 +40,7 @@ def get(url):
 		if data.startswith('FORM') or data.startswith('Glul') or ord(data[0]) < 9:
 			pass
 		else:
-			raise Exception('url does not contain a story file')
+			raise ProxyError('url does not contain a story file')
 		
 		# All good... cache it and return (don't cache big files for now)
 		if len(data) <= MAX_FILE_SIZE:
@@ -46,6 +48,15 @@ def get(url):
 				logging.error('Memcache set failed for url ' + url)
 		
 		return data
+
+def fetch_single(url, headers={}):
+	'''Get one part of a file'''
+	try:
+		request = urlfetch.fetch(url, headers=headers, allow_truncated=True, deadline=10)
+	except urlfetch.DownloadError, e:
+		raise ProxyError('could not contact server, or server too slow', e)
+		
+	return request
 
 def fetch_big(url, size, last):
 	'''Get the rest of a big file'''
@@ -63,7 +74,7 @@ def fetch_big(url, size, last):
 	tempurl = url + '#' + str(minrange)
 	
 	# Request the next part of the file
-	request = urlfetch.fetch(tempurl, headers=headers, allow_truncated=True)
+	request = fetch_single(tempurl, headers)
 	data = request.content
 	
 	# If that's not all, recursively fetch the next part
