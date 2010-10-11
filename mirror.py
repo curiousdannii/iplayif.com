@@ -26,25 +26,25 @@ def get(url):
 	# Missed! Attempt to download it now
 	else:
 		result = fetch_single(url)
+		data = result.content
 		
 		# HTTP Status code
 		if result.status_code != 200:
 			raise ProxyError('got status code %d for url %s' % (result.status_code, url))
-		
-		# Check for oversized requests
-		data = result.content
-		if result.content_was_truncated:
-			data += fetch_big(url, int(result.headers['Content-Length']), len(data) - 1)
-		
-		# Check it's a valid glulx/zcode story file
+
+		# Check it's a valid glulx/zcode story file, before downloading the rest
 		if data.startswith('FORM') or data.startswith('Glul') or ord(data[0]) < 9:
 			pass
 		else:
 			raise ProxyError('url does not contain a story file')
 		
+		# Check for oversized requests
+		if result.content_was_truncated:
+			data += fetch_big(url, int(result.headers['Content-Length']), len(data) - 1)
+		
 		# All good... cache it and return (don't cache big files for now)
 		if len(data) <= MAX_FILE_SIZE:
-			if not memcache.add(url, data, 3600):
+			if not memcache.add(url, data, 86400):
 				logging.error('Memcache set failed for url ' + url)
 		
 		return data

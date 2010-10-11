@@ -33,8 +33,9 @@ class ProxyHandler(webapp.RequestHandler):
 		encode = self.request.get('encode')
 		
 		if not url:
-			self.code = 400
-			raise ProxyError('no url provided')
+			# Show the home page
+			self.redirect('/')
+			return
 		
 		# Get this URL
 		url = url.replace(' ', '%20')
@@ -80,31 +81,45 @@ class ProxyHandler(webapp.RequestHandler):
 		
 
 class LegacyHandler(webapp.RequestHandler):
-  '''The original jsonp proxy server'''
-  def get(self):
-    url = self.request.get("url")
-    jsonp = self.request.get("jsonp")
+	'''The original jsonp proxy server'''
+	def get(self):
+		url = self.request.get("url")
+		jsonp = self.request.get("jsonp")
 
-    try:
-      if not url:
-        raise Exception("no url provided")
-        
-      url = url.replace(" ", "%20")
-      data = mirror.get(url)
-      response = {'data': base64.b64encode(data)}
-      
-    except Exception, e:
-      response = {"error" : repr(e)}
-    
-    self.response.headers["Content-Type"] = "text/javascript"
-    self.response.out.write("%s(%s);" % (jsonp, simplejson.dumps(response)))
+		try:
+			if not url:
+				# Show the home page
+				self.print_home()
+				return
+
+			url = url.replace(" ", "%20")
+			data = mirror.get(url)
+			response = {'data': base64.b64encode(data)}
+		  
+		except Exception, e:
+			response = {"error" : repr(e)}
+
+		self.response.headers["Content-Type"] = "text/javascript"
+		self.response.out.write("%s(%s);" % (jsonp, simplejson.dumps(response)))
+	
+	def print_home(self):
+		# Print a home page
+		self.response.headers["Content-Type"] = "text/html"
+		self.response.out.write('''
+<!doctype html>
+<title>Parchment-proxy</title>
+<h1>Parchment-proxy</h1>
+<p>This is the proxy for Parchment the web IF interpreter.
+<p>If you want to read a story with Parchment go to <a href="http://parchment.toolness.com/">http://parchment.toolness.com/</a>
+<p>If you want to know more about Parchment-proxy go to <a href="http://github.com/curiousdannii/parchment-proxy">http://github.com/curiousdannii/parchment-proxy</a>
+		''')
 
 def main():
 	application = webapp.WSGIApplication([
-	                                      ('/proxy/?', ProxyHandler),
-	                                      ('/', LegacyHandler),
-	                                     ], debug=True)
+		('/proxy/?', ProxyHandler),
+		('/', LegacyHandler),
+	], debug=True)
 	run_wsgi_app(application)
 
 if __name__ == '__main__':
-  main()
+	main()
