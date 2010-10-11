@@ -60,8 +60,7 @@ class ProxyHandler(webapp.RequestHandler):
 		
 		self.response.headers['Access-Control-Allow-Origin'] = '*'
 		self.response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
-		# Why must Prototype add these?
-		self.response.headers['Access-Control-Allow-Headers'] = 'x-prototype-version, x-requested-with'
+		self.response.headers['Access-Control-Allow-Headers'] = self.request.headers['Access-Control-Request-Headers']
 	
 	def handle_exception(self, e, debug):
 		# Handle exceptions
