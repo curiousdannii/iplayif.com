@@ -5,6 +5,8 @@ Parchment-proxy is a simple Google App Engine server for proxying Interactive Fi
 
 You may install your own, or use ours at <http://zcode.appspot.com/proxy/>
 
+It is BSD licenced, but please help the community by sharing any changes you make with us.
+
 How to use
 ----------
 
@@ -23,10 +25,12 @@ Parameters:
    
 -	`callback`: a callback function for JSONP
 	
-	If you're using jQuery, set the `dataType` to `'jsonp'` and it will automatically create the callback function and add this parameter for you. Other libraries may do the same.
+	If you're using jQuery and you set the `dataType` to `'jsonp'`, it will automatically create the callback function and add this parameter for you. Other libraries may do the same. However, as the parameter jQuery choses for you will be unique, the results won't be cached, and so it's recommended that you manually specify the callback function. See <http://api.jquery.com/jQuery.ajax/> for more information.
 	
 	If you use a callback, also set `encode=base64`.
 
 Parchment-proxy will send the data with a `Content-Type` header of `'text/plain; charset=ISO-8859-1'` and an `Access-Control-Allow-Origin` header of `'*'` for cross-site AJAX requests. Similarly, it will handle an `OPTIONS` request if you need to preflight your cross-site requests.
+
+Parchment-proxy uses `ETag` and `If-None-Match` headers to manage caching. In most situations you shouldn't need to manually use the headers.
 
 There is currently no limit for requested files, but as big files aren't cached, please be gentle!

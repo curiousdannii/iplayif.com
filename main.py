@@ -1,16 +1,18 @@
 #!/usr/bin/env python
 # Parchment-proxy - A proxy for fetching web data for Parchment
-# Copyright 2008-2010 The Parchment-proxy contributors (see CONTRIBUTORS)
+# Copyright 2008-2011 The Parchment-proxy contributors (see CONTRIBUTORS)
 # Released under a BSD-like licence, see LICENCE
 
 # main.py: Main server and response handler
 
 import base64
+import hashlib
 import logging
 import sys
 import traceback
 
 from django.utils import simplejson
+from google.appengine.api import memcache
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 
@@ -28,18 +30,35 @@ class ProxyHandler(webapp.RequestHandler):
 	
 	def get(self):
 		# Parameters
-		url = self.request.get('url')
+		url = self.request.get('url').replace(' ', '%20')
 		callback = self.request.get('callback')
 		encode = self.request.get('encode')
+		ifnonematch = self.request.headers.get('If-None-Match')
 		
 		if not url:
 			# Show the home page
 			self.redirect('/')
 			return
 		
+		# Set headers for allowing cross domain XHR and content type
+		self.response.headers['Access-Control-Allow-Origin'] = '*'
+		self.response.headers['Content-Type'] = 'text/plain; charset=ISO-8859-1'
+		
+		# Check for a cached hash
+		hash = memcache.get(url + '_hash')
+		if hash == ifnonematch:
+			self.response.set_status(304)
+			self.response.headers['ETag'] = hash
+			return
+		
 		# Get this URL
-		url = url.replace(' ', '%20')
 		data = mirror.get(url)
+		
+		# Generate the hash if needed
+		if not hash:
+			hash = '"' + hashlib.md5(data).hexdigest() + '"'
+			if not memcache.add(url + '_hash', hash, 86400):
+				logging.error('Memcache set failed for hash of url ' + url)
 		
 		# Base64 encode the data if required
 		if encode == 'base64':
@@ -50,9 +69,8 @@ class ProxyHandler(webapp.RequestHandler):
 			# Warning, data must be escaped too
 			data = callback + '("' + data + '")'
 		
-		# Set a header for allowing cross domain XHR and send the data
-		self.response.headers['Access-Control-Allow-Origin'] = '*'
-		self.response.headers['Content-Type'] = 'text/plain; charset=ISO-8859-1'
+		# Sent the data
+		self.response.headers['ETag'] = hash
 		self.response.out.write(data)
 		
 	def options(self):
