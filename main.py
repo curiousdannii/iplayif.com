@@ -33,7 +33,7 @@ class ProxyHandler(webapp.RequestHandler):
 		url = self.request.get('url').replace(' ', '%20')
 		callback = self.request.get('callback')
 		encode = self.request.get('encode')
-		ifnonematch = self.request.headers.get('If-None-Match')
+		ifnonematch = self.request.headers.get('If-None-Match') or ''
 		
 		if not url:
 			# Show the home page
