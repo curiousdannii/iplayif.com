@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # Parchment-proxy - A proxy for fetching web data for Parchment
-# Copyright 2008-2011 The Parchment-proxy contributors (see CONTRIBUTORS)
+# Copyright 2008-2012 The Parchment-proxy contributors (see CONTRIBUTORS)
 # Released under a BSD-like licence, see LICENCE
 
 # main.py: Main server and response handler
@@ -68,6 +68,7 @@ class ProxyHandler(webapp.RequestHandler):
 		if callback:
 			# Warning, data must be escaped too
 			data = callback + '("' + data + '")'
+			self.response.headers['Content-Type'] = 'text/javascript'
 		
 		# Sent the data
 		self.response.headers['ETag'] = hash
@@ -78,7 +79,7 @@ class ProxyHandler(webapp.RequestHandler):
 		
 		self.response.headers['Access-Control-Allow-Origin'] = '*'
 		self.response.headers['Access-Control-Allow-Methods'] = 'GET, OPTIONS'
-		self.response.headers['Access-Control-Allow-Headers'] = self.request.headers['Access-Control-Request-Headers']
+		self.response.headers['Access-Control-Allow-Headers'] = self.request.headers.get('Access-Control-Request-Headers') or ''
 	
 	def handle_exception(self, e, debug):
 		# Handle exceptions
@@ -89,13 +90,15 @@ class ProxyHandler(webapp.RequestHandler):
 			self.code = 500
 		self.response.set_status(self.code)
 		
+		# Send the exception message as a header
+		self.response.headers['x-exception'] = repr(e)
+		
 		# Write out the error message
 		self.response.out.write(e)
 		
 		# Log this error too
 		logging.error(repr(e))
 		logging.error(''.join(traceback.format_tb(sys.exc_info()[2])))
-		
 
 class LegacyHandler(webapp.RequestHandler):
 	'''The original jsonp proxy server'''
@@ -127,7 +130,7 @@ class LegacyHandler(webapp.RequestHandler):
 <title>Parchment-proxy</title>
 <h1>Parchment-proxy</h1>
 <p>This is the proxy for Parchment the web IF interpreter.
-<p>If you want to read a story with Parchment go to <a href="http://parchment.toolness.com/">http://parchment.toolness.com/</a>
+<p>If you want to read a story with Parchment go to <a href="http://iplayif.com/">http://iplayif.com</a>
 <p>If you want to know more about Parchment-proxy go to <a href="http://github.com/curiousdannii/parchment-proxy">http://github.com/curiousdannii/parchment-proxy</a>
 		''')
 

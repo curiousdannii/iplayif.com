@@ -33,4 +33,4 @@ Parchment-proxy will send the data with a `Content-Type` header of `'text/plain;
 
 Parchment-proxy uses `ETag` and `If-None-Match` headers to manage caching. In most situations you shouldn't need to manually use the headers.
 
-There is currently no limit for requested files, but as big files aren't cached, please be gentle!
+There is a limit of 32MB for requested files, but files over 1MB aren't cached, so please be gentle!
