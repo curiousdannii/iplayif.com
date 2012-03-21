@@ -1,0 +1,13 @@
+{
+	"name": "parchment-proxy",
+	"version": "0.0.1",
+	"dependencies": {
+		"connect": "2.x",
+		"express": "2.5.x",
+		"request": "2.9.x"
+	},
+	"engines": {
+		"node": "0.6.x",
+		"npm":  "1.1.x"
+	}
+}
