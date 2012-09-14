@@ -46,7 +46,7 @@ def get(url):
 		
 		# All good... cache it and return (don't cache big files for now)
 		if len(data) <= MAX_FILE_SIZE:
-			if not memcache.add(url, data, 86400):
+			if not memcache.add(url, data, 3600):
 				logging.error('Memcache set failed for url ' + url)
 		
 		return data

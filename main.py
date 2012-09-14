@@ -57,7 +57,7 @@ class ProxyHandler(webapp.RequestHandler):
 		# Generate the hash if needed
 		if not hash:
 			hash = '"' + hashlib.md5(data).hexdigest() + '"'
-			if not memcache.add(url + '_hash', hash, 86400):
+			if not memcache.add(url + '_hash', hash, 3600):
 				logging.error('Memcache set failed for hash of url ' + url)
 		
 		# Base64 encode the data if required
