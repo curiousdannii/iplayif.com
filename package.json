@@ -1,13 +1,24 @@
 {
-	"name": "parchment-proxy",
-	"version": "0.0.1",
-	"dependencies": {
-		"connect": "2.x",
-		"express": "2.5.x",
-		"request": "2.9.x"
-	},
-	"engines": {
-		"node": "0.6.x",
-		"npm":  "1.1.x"
-	}
+    "name": "parchment-proxy",
+    "version": "4.0.0",
+    "title": "Parchment IF Proxy",
+    "author": "Dannii Willis <curiousdannii@gmail.com>",
+    "description": "Interactive fiction web proxy service",
+    "repository": "curiousdannii/parchment-proxy",
+    "license": "MIT",
+    "dependencies": {
+        "@koa/cors": "^2.2.2",
+        "koa": "^2.5.2",
+        "koa-conditional-get": "^2.0.0",
+        "koa-etag": "^3.0.0",
+        "koa-route": "^3.2.0",
+        "node-fetch": "^2.2.0"
+    },
+    "devDependencies": {
+        "nodemon": "^1.18.3"
+    },
+    "scripts": {
+        "start": "node app/app.js",
+        "watch": "nodemon app/app.js"
+    }
 }

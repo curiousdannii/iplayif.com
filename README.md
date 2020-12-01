@@ -1,19 +1,19 @@
-Parchment-proxy
-===============
+Parchment IF Proxy
+==================
 
 Parchment-proxy is a simple Google App Engine server for proxying Interactive Fiction files for web interpreters like Parchment.
 
-You may install your own, or use ours at <http://zcode.appspot.com/proxy/>
+You may install your own, or use ours at <https://proxy.iplayif.com/>
 
-It is BSD licenced, but please help the community by sharing any changes you make with us.
+Parchment-proxy is MIT licensed.
 
 How to use
 ----------
 
 Examples:
 
--	<http://zcode.appspot.com/proxy/?url=http://mirror.ifarchive.org/if-archive/games/springthing/2007/Fate.z8>
--	<http://zcode.appspot.com/proxy/?callback=processBase64Zcode&encode=base64&url=http://mirror.ifarchive.org/if-archive/games/springthing/2007/Fate.z8>
+-	<https://proxy.iplayif.com/proxy/?url=http://mirror.ifarchive.org/if-archive/games/springthing/2007/Fate.z8>
+-	<https://proxy.iplayif.com/proxy/?callback=processBase64Zcode&encode=base64&url=http://mirror.ifarchive.org/if-archive/games/springthing/2007/Fate.z8>
 
 Access the proxy by the `/proxy/` URL. `/` still works, but has a depreciated API.
 
